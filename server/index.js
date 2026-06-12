@@ -3,6 +3,9 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 require('dotenv').config();
 
+// Import routes
+const authRoutes = require('./routes/auth');
+
 const app = express();
 
 // Middleware 
@@ -13,6 +16,9 @@ app.use(express.json());
 app.get('/', (req, res) => {
   res.json({ message: 'SmartNotes API is running' });
 });
+
+// Mount routes
+app.use('/api/auth', authRoutes);
 
 // Connect to MongoDB then start the server
 const PORT = process.env.PORT || 5001;

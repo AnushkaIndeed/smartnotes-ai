@@ -6,7 +6,7 @@ const authMiddleware = (req, res, next) => {
   const authHeader = req.headers.authorization;
 
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return res.status(401).json({ error: 'No token — please log in' });
+    return res.status(401).json({ error: 'No token — please log in' }); //when a unauthosized user tries to access a protected route, we send this response
   }
 
   const token = authHeader.split(' ')[1]; // grab just the token part

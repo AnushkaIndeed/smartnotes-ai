@@ -2,10 +2,17 @@ import { useState, useEffect } from 'react';
 import { useNotes } from '../hooks/useNotes';
 import { useDebounce } from '../hooks/useDebounce';
 import { useAuth } from '../context/AuthContext';
+import { useFiles } from '../hooks/useFiles';
 
 export default function NotesApp() {
   const { notes, loading, createNote, updateNote, deleteNote } = useNotes();
   const { logout, user } = useAuth();
+
+  const { files, uploading, uploadFile } = useFiles();
+  const handleFileChange = (e) => {
+  const file = e.target.files[0];
+  if (file) uploadFile(file);
+    };
 
   const [activeId, setActiveId] = useState(null);
   const [title, setTitle] = useState('');
@@ -84,6 +91,30 @@ export default function NotesApp() {
             </div>
           ))}
         </div>
+
+
+        <div className="border-t p-3">
+            <p className="text-xs text-gray-500 mb-2">Uploaded PDFs</p>
+
+            <label className="block text-sm bg-gray-100 rounded p-2 text-center cursor-pointer hover:bg-gray-200">
+                {uploading ? 'Uploading...' : '+ Upload PDF'}
+                <input
+                type="file"
+                accept="application/pdf"
+                onChange={handleFileChange}
+                className="hidden"
+                disabled={uploading}
+                />
+            </label>
+
+    <div className="mt-2 max-h-32 overflow-y-auto">
+        {files.map((f) => (
+        <div key={f._id} className="text-xs text-gray-600 truncate py-1">
+            📄 {f.filename}
+        </div>
+        ))}
+    </div>
+    </div>
       </div>
 
       {/* Editor */}

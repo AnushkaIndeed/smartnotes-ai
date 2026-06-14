@@ -4,6 +4,7 @@ import { useDebounce } from '../hooks/useDebounce';
 import { useAuth } from '../context/AuthContext';
 import { useFiles } from '../hooks/useFiles';
 import ChatPanel from '../components/ChatPanel';
+import NotesSkeleton from '../components/NotesSkeleton';
 
 export default function NotesApp() {
   const { notes, loading, createNote, updateNote, deleteNote } = useNotes();
@@ -110,42 +111,39 @@ export default function NotesApp() {
 
         {/* Notes list */}
         <div className="flex-1 overflow-y-auto">
-          {loading && (
-            <div className="p-3 space-y-2">
-              {[1, 2, 3].map((i) => (
-                <div key={i} className="h-8 bg-gray-200 rounded animate-pulse" />
+          {loading ? (
+            <NotesSkeleton />
+          ) : (
+            <>
+              {notes.length === 0 && (
+                <p className="text-xs text-gray-400 text-center mt-4 px-2">
+                  No notes yet — create one!
+                </p>
+              )}
+              {notes.map((note) => (
+                <div
+                  key={note._id}
+                  onClick={() => handleSelectNote(note)}
+                  className={`px-3 py-2 cursor-pointer flex justify-between items-center group ${
+                    activeId === note._id ? 'bg-blue-100' : 'hover:bg-gray-100'
+                  }`}
+                >
+                  <span className="text-sm truncate">
+                    {note.title || 'Untitled note'}
+                  </span>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDelete(note._id);
+                    }}
+                    className="text-xs text-red-400 ml-1 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity"
+                  >
+                    ✕
+                  </button>
+                </div>
               ))}
-            </div>
+            </>
           )}
-
-          {!loading && notes.length === 0 && (
-            <p className="text-xs text-gray-400 text-center mt-4 px-2">
-              No notes yet — create one!
-            </p>
-          )}
-
-          {!loading && notes.map((note) => (
-            <div
-              key={note._id}
-              onClick={() => handleSelectNote(note)}
-              className={`px-3 py-2 cursor-pointer flex justify-between items-center group ${
-                activeId === note._id ? 'bg-blue-100' : 'hover:bg-gray-100'
-              }`}
-            >
-              <span className="text-sm truncate">
-                {note.title || 'Untitled note'}
-              </span>
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleDelete(note._id);
-                }}
-                className="text-xs text-red-400 ml-1 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity"
-              >
-                ✕
-              </button>
-            </div>
-          ))}
         </div>
 
         {/* PDF section */}
@@ -224,7 +222,7 @@ export default function NotesApp() {
       </div>
 
       {/* Column 3: Chat panel */}
-      <div className="w-80 min-w-[320px] border-l flex flex-col shrink-0 bg-blue">
+      <div className="w-80 min-w-[320px] border-l flex flex-col shrink-0 bg-red-100">
         <ChatPanel
           contentId={chatTarget?.id}
           contentType={chatTarget?.type}

@@ -17,6 +17,7 @@ export default function NotesApp() {
   const [content, setContent] = useState('');
   const [chatTarget, setChatTarget] = useState(null);
   const [saveStatus, setSaveStatus] = useState('saved');
+  const [chatWidth, setChatWidth] = useState(() => Number(localStorage.getItem('chatWidth')) || 340);
 
   const activeNote = notes.find((n) => n._id === activeId);
 
@@ -26,6 +27,10 @@ export default function NotesApp() {
       setContent(activeNote.content);
     }
   }, [activeId]);
+
+  useEffect(() => {
+    localStorage.setItem('chatWidth', String(chatWidth));
+  }, [chatWidth]);
 
   const debouncedTitle = useDebounce(title);
   const debouncedContent = useDebounce(content);
@@ -85,6 +90,29 @@ export default function NotesApp() {
     const file = e.target.files[0];
     if (file) await uploadFile(file);
     e.target.value = '';
+  };
+
+  const handleResizeStart = (e) => {
+    e.preventDefault();
+    const startX = e.clientX;
+    const startWidth = chatWidth;
+
+    const handlePointerMove = (moveEvent) => {
+      const nextWidth = startWidth - (moveEvent.clientX - startX);
+      setChatWidth(Math.min(Math.max(nextWidth, 260), 560));
+    };
+
+    const handlePointerUp = () => {
+      window.removeEventListener('pointermove', handlePointerMove);
+      window.removeEventListener('pointerup', handlePointerUp);
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
+    };
+
+    document.body.style.cursor = 'col-resize';
+    document.body.style.userSelect = 'none';
+    window.addEventListener('pointermove', handlePointerMove);
+    window.addEventListener('pointerup', handlePointerUp);
   };
 
   return (
@@ -267,7 +295,6 @@ export default function NotesApp() {
                   e.currentTarget.querySelector('.pdf-del').style.opacity = '0';
                 }}
               >
-                {/* Clickable area */}
                 <div
                   onClick={() => handleSelectFile(f)}
                   style={{
@@ -284,7 +311,6 @@ export default function NotesApp() {
                   </span>
                 </div>
 
-                {/* Delete button */}
                 <button
                   className="pdf-del"
                   onClick={(e) => { e.stopPropagation(); handleDeleteFile(f._id); }}
@@ -304,7 +330,7 @@ export default function NotesApp() {
       </div>
 
       {/* Editor */}
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', minWidth: 0 }}>
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', minWidth: '320px' }}>
         {activeNote && (
           <div style={{
             padding: '10px 32px', borderBottom: '1px solid var(--border)',
@@ -366,10 +392,26 @@ export default function NotesApp() {
         </div>
       </div>
 
+      <div
+        role="separator"
+        aria-label="Resize chat panel"
+        title="Drag to resize chat panel"
+        onPointerDown={handleResizeStart}
+        style={{
+          width: '8px',
+          flexShrink: 0,
+          cursor: 'col-resize',
+          background: 'var(--bg-primary)',
+          borderLeft: '1px solid var(--border)',
+          borderRight: '1px solid var(--border)',
+        }}
+        onMouseEnter={e => e.currentTarget.style.background = 'var(--bg-hover)'}
+        onMouseLeave={e => e.currentTarget.style.background = 'var(--bg-primary)'}
+      />
+
       {/* Chat panel */}
       <div style={{
-        width: '300px', minWidth: '300px',
-        borderLeft: '1px solid var(--border)',
+        width: `${chatWidth}px`, minWidth: '260px', maxWidth: '560px',
         display: 'flex', flexDirection: 'column',
         overflow: 'hidden', background: 'var(--bg-primary)',
       }}>

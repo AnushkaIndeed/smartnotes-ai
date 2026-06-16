@@ -6,11 +6,13 @@ export default function ChatPanel({ contentId, contentType, contentTitle }) {
   const { messages, loading, error, sendMessage, clearMessages } = useAI();
   const bottomRef = useRef(null);
 
+  // Clear chat history when user switches to a different note/file
   useEffect(() => {
     clearMessages();
     setInput('');
   }, [contentId]);
 
+  // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, loading]);
@@ -22,6 +24,7 @@ export default function ChatPanel({ contentId, contentType, contentTitle }) {
   };
 
   const handleKeyDown = (e) => {
+    // Send on Enter, new line on Shift+Enter
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       handleSend();
@@ -38,12 +41,16 @@ export default function ChatPanel({ contentId, contentType, contentTitle }) {
 
   return (
     <div className="flex flex-col h-full">
+
+      {/* Header */}
       <div className="p-3 border-b">
         <p className="text-xs text-gray-500">Chatting about:</p>
         <p className="text-sm font-medium truncate">{contentTitle}</p>
       </div>
 
+      {/* Messages */}
       <div className="flex-1 overflow-y-auto p-3 space-y-3">
+
         {messages.length === 0 && (
           <p className="text-xs text-gray-400 text-center mt-4">
             Ask anything about this {contentType}
@@ -78,6 +85,7 @@ export default function ChatPanel({ contentId, contentType, contentTitle }) {
         <div ref={bottomRef} />
       </div>
 
+      {/* Input */}
       <div className="p-3 border-t flex gap-2">
         <textarea
           value={input}
@@ -96,6 +104,7 @@ export default function ChatPanel({ contentId, contentType, contentTitle }) {
           Send
         </button>
       </div>
+
     </div>
   );
 }

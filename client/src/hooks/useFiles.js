@@ -25,9 +25,14 @@ export function useFiles() {
     }
   };
 
+  const deleteFile = async (id) => {
+    await api.delete(`/files/${id}`);
+    setFiles((prev) => prev.filter((file) => file._id !== id));
+  };
+
   useEffect(() => {
     fetchFiles();
   }, []);
 
-  return { files, uploading, uploadFile };
+  return { files, uploading, uploadFile, deleteFile, fetchFiles };
 }

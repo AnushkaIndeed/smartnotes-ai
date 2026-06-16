@@ -24,15 +24,15 @@ export function useFiles() {
       setUploading(false);
     }
   };
-
+  // Delete a file by ID
   const deleteFile = async (id) => {
     await api.delete(`/files/${id}`);
-    setFiles((prev) => prev.filter((file) => file._id !== id));
+    setFiles((prev) => prev.filter((f) => f._id !== id));
   };
 
   useEffect(() => {
     fetchFiles();
   }, []);
 
-  return { files, uploading, uploadFile, deleteFile, fetchFiles };
+  return { files, uploading, uploadFile };
 }

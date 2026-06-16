@@ -49,16 +49,15 @@ router.post('/chat', authMiddleware, async (req, res) => {
     // Step 2: AUGMENT — build the prompt with the content as context
     const systemPrompt = `You are a helpful assistant for a note-taking app.
 The user is asking about their ${contextLabel}.
-Answer based ONLY on the content provided below.
-If the answer isn't in the content, say so honestly.
 Be concise and clear.
-
+Answer primarily from the provided context.
+If the answer is not available in the context, clearly state that and then provide a brief general answer from your own knowledge.
 --- CONTENT START ---
 ${contextText}
 --- CONTENT END ---`;
 
     // Step 3: GENERATE — call Gemini with the augmented prompt
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
     const result = await model.generateContent(systemPrompt + '\n\nUser question: ' + question);
     const answer = result.response.text();
 

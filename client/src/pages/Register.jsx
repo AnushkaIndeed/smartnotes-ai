@@ -21,18 +21,27 @@ export default function Register() {
   };
 
   return (
-    <div className="flex items-center justify-center h-screen bg-gray-50">
-      <form onSubmit={handleSubmit} className="bg-white p-8 rounded-lg shadow-sm w-80">
-        <h1 className="text-xl font-medium mb-4">Create account</h1>
+    <div className="auth-screen">
+      <Link to="/" className="auth-brand" aria-label="Back to SmartNotes home">
+        <span>S</span>
+        SmartNotes AI
+      </Link>
 
-        {error && <p className="text-red-600 text-sm mb-3">{error}</p>}
+      <form onSubmit={handleSubmit} className="auth-card">
+        <div className="auth-copy">
+          <p>Start free</p>
+          <h1>Create your workspace</h1>
+          <span>Set up SmartNotes AI and turn your notes and PDFs into a study assistant.</span>
+        </div>
+
+        {error && <p className="auth-error">{error}</p>}
 
         <input
           type="email"
           placeholder="Email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="w-full border rounded p-2 mb-3"
+          className="auth-input"
           required
         />
         <input
@@ -40,16 +49,16 @@ export default function Register() {
           placeholder="Password (min 6 chars)"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="w-full border rounded p-2 mb-4"
+          className="auth-input"
           required
           minLength={6}
         />
-        <button type="submit" className="w-full bg-blue-600 text-white rounded p-2">
-          Register
+        <button type="submit" className="auth-submit">
+          Create account
         </button>
 
-        <p className="text-sm mt-3 text-center">
-          Have an account? <Link to="/login" className="text-blue-600">Log in</Link>
+        <p className="auth-switch">
+          Have an account? <Link to="/login">Log in</Link>
         </p>
       </form>
     </div>

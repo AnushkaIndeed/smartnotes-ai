@@ -6,11 +6,13 @@ export default function ChatPanel({ contentId, contentType, contentTitle }) {
   const { messages, loading, error, sendMessage, clearMessages } = useAI();
   const bottomRef = useRef(null);
 
+  // Clear chat history when user switches to a different note/file
   useEffect(() => {
     clearMessages();
     setInput('');
   }, [contentId]);
 
+  // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, loading]);
@@ -22,6 +24,7 @@ export default function ChatPanel({ contentId, contentType, contentTitle }) {
   };
 
   const handleKeyDown = (e) => {
+    // Send on Enter, new line on Shift+Enter
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       handleSend();
@@ -37,65 +40,131 @@ export default function ChatPanel({ contentId, contentType, contentTitle }) {
   }
 
   return (
-    <div className="flex flex-col h-full">
-      <div className="p-3 border-b">
-        <p className="text-xs text-gray-500">Chatting about:</p>
-        <p className="text-sm font-medium truncate">{contentTitle}</p>
-      </div>
+  <div className="flex flex-col h-full">
 
-      <div className="flex-1 overflow-y-auto p-3 space-y-3">
-        {messages.length === 0 && (
-          <p className="text-xs text-gray-400 text-center mt-4">
-            Ask anything about this {contentType}
-          </p>
-        )}
+    {/* Header */}
+    <div
+      className="p-3 border-b"
+      style={{ borderColor: 'var(--border)' }}
+    >
+      <p
+        className="text-xs"
+        style={{ color: 'var(--text-secondary)' }}
+      >
+        Chatting about:
+      </p>
 
-        {messages.map((msg, i) => (
-          <div
-            key={i}
-            className={`text-sm rounded-lg p-3 max-w-[90%] whitespace-pre-wrap ${
-              msg.role === 'user'
-                ? 'bg-blue-600 text-white ml-auto'
-                : 'bg-gray-100 text-gray-800'
-            }`}
-          >
-            {msg.text}
-          </div>
-        ))}
-
-        {loading && (
-          <div className="bg-gray-100 rounded-lg p-3 max-w-[90%]">
-            <span className="text-sm text-gray-500">Thinking...</span>
-          </div>
-        )}
-
-        {error && (
-          <div className="bg-red-50 border border-red-200 rounded-lg p-3 text-xs text-red-600">
-            {error}
-          </div>
-        )}
-
-        <div ref={bottomRef} />
-      </div>
-
-      <div className="p-3 border-t flex gap-2">
-        <textarea
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyDown={handleKeyDown}
-          placeholder="Ask a question... (Enter to send)"
-          rows={2}
-          className="flex-1 border rounded p-2 text-sm resize-none outline-none focus:border-blue-400"
-          disabled={loading}
-        />
-        <button
-          onClick={handleSend}
-          disabled={loading || !input.trim()}
-          className="bg-blue-600 text-white px-3 rounded text-sm disabled:opacity-50 self-end"
-        >
-          Send
-        </button>
-      </div>
+      <p
+        className="text-sm font-medium truncate"
+        style={{ color: 'var(--text-primary)' }}
+      >
+        {contentTitle}
+      </p>
     </div>
-  );
+
+    {/* Messages */}
+    <div className="flex-1 overflow-y-auto p-3 space-y-3">
+
+      {messages.length === 0 && (
+        <p
+          className="text-xs text-center mt-4"
+          style={{ color: 'var(--text-secondary)' }}
+        >
+          Ask anything about this {contentType}
+        </p>
+      )}
+
+      {messages.map((msg, i) => (
+        <div
+          key={i}
+          className={`text-sm rounded-xl p-3 max-w-[90%] whitespace-pre-wrap ${
+            msg.role === 'user' ? 'ml-auto' : ''
+          }`}
+          style={{
+            background:
+              msg.role === 'user'
+                ? 'var(--accent)'
+                : 'var(--bg-secondary)',
+            color:
+              msg.role === 'user'
+                ? '#ffffff'
+                : 'var(--text-primary)',
+            border:
+              msg.role === 'user'
+                ? 'none'
+                : '1px solid var(--border)',
+          }}
+        >
+          {msg.text}
+        </div>
+      ))}
+
+      {loading && (
+        <div
+          className="rounded-xl p-3 max-w-[90%]"
+          style={{
+            background: 'var(--bg-secondary)',
+            border: '1px solid var(--border)',
+          }}
+        >
+          <span
+            className="text-sm"
+            style={{ color: 'var(--text-secondary)' }}
+          >
+            Thinking...
+          </span>
+        </div>
+      )}
+
+      {error && (
+        <div
+          className="rounded-xl p-3 text-xs"
+          style={{
+            background: 'rgba(239,68,68,0.1)',
+            border: '1px solid rgba(239,68,68,0.3)',
+            color: '#ef4444',
+          }}
+        >
+          {error}
+        </div>
+      )}
+
+      <div ref={bottomRef} />
+    </div>
+
+    {/* Input */}
+    <div
+      className="p-3 border-t flex gap-2"
+      style={{ borderColor: 'var(--border)' }}
+    >
+      <textarea
+        value={input}
+        onChange={(e) => setInput(e.target.value)}
+        onKeyDown={handleKeyDown}
+        placeholder="Ask a question... (Enter to send)"
+        rows={2}
+        disabled={loading}
+        style={{
+          background: 'var(--bg-primary)',
+          color: 'var(--text-primary)',
+          border: '1px solid var(--border)',
+        }}
+        className="flex-1 rounded-xl p-3 text-sm resize-none outline-none"
+      />
+
+      <button
+        onClick={handleSend}
+        disabled={loading || !input.trim()}
+        style={{
+          background: 'var(--accent)',
+          color: '#fff',
+        }}
+        className="px-4 py-2 rounded-xl text-sm disabled:opacity-50 self-end"
+      >
+        Send
+      </button>
+    </div>
+
+  </div>
+);
 }

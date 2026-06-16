@@ -16,7 +16,13 @@ const aiRoutes = require('./routes/ai');
 const app = express();
 
 // Middleware 
-app.use(cors());
+app.use(cors({
+  origin: [
+    'http://localhost:5173',          // local dev
+    process.env.FRONTEND_URL          // production URL from .env
+  ],
+  credentials: true
+}));
 app.use(express.json()); 
 
 // Log all incoming requests for debugging route issues

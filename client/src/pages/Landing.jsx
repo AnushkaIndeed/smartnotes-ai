@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import DashboardPreview from "../components/DashboardPreview";
 
 const fadeUpClass = 'translate-y-0 opacity-100';
 
@@ -72,7 +73,7 @@ export default function Landing() {
           <h1 className="landing-fade font-display mb-8 text-5xl leading-[1.05] font-bold tracking-tight text-balance md:text-7xl">
             Your Notes. Your PDFs.
             <br />
-            <span className="bg-gradient-to-r from-brand-accent to-violet-300 bg-clip-text text-transparent">
+            <span className="bg-linear-to-r from-brand-accent to-violet-300 bg-clip-text text-transparent">
               Your AI Assistant.
             </span>
           </h1>
@@ -98,37 +99,8 @@ export default function Landing() {
             </a>
           </div>
         </div>
-
         <div className="landing-fade mx-auto mt-20 max-w-6xl">
-          <div className="glass-card relative aspect-[16/9] w-full overflow-hidden rounded-2xl shadow-2xl">
-            <div className="absolute inset-0 flex">
-              <div className="flex w-1/5 flex-col gap-3 border-r border-brand-border p-4">
-                <div className="h-6 w-full rounded-md bg-brand-accent/20 ring-1 ring-brand-accent/30" />
-                <div className="h-6 w-full rounded-md bg-brand-border/50" />
-                <div className="h-6 w-full rounded-md bg-brand-border/50" />
-                <div className="h-6 w-full rounded-md bg-brand-border/50" />
-              </div>
-              <div className="flex-1 p-6">
-                <div className="mb-6 h-7 w-1/2 rounded-md bg-brand-muted/20" />
-                <div className="space-y-3">
-                  <div className="h-3 w-full rounded bg-brand-muted/10" />
-                  <div className="h-3 w-[92%] rounded bg-brand-muted/10" />
-                  <div className="h-3 w-[88%] rounded bg-brand-muted/10" />
-                  <div className="h-3 w-[40%] rounded bg-brand-muted/10" />
-                </div>
-              </div>
-              <div className="flex w-1/4 flex-col gap-3 border-l border-brand-border bg-brand-surface/40 p-4">
-                <div className="rounded-xl border border-brand-accent/20 bg-brand-accent/10 p-3">
-                  <div className="mb-2 h-2 w-full rounded bg-brand-accent/40" />
-                  <div className="h-2 w-3/4 rounded bg-brand-accent/40" />
-                </div>
-                <div className="rounded-xl border border-brand-border bg-white/5 p-3">
-                  <div className="mb-2 h-2 w-full rounded bg-brand-muted/40" />
-                  <div className="h-2 w-2/3 rounded bg-brand-muted/40" />
-                </div>
-              </div>
-            </div>
-          </div>
+          <DashboardPreview />
         </div>
       </section>
 
@@ -218,55 +190,57 @@ export default function Landing() {
             </div>
           </div>
 
-          <div className="relative lg:col-span-7">
-            <div className="aspect-[16/10] overflow-hidden rounded-xl border border-brand-border bg-brand-bg shadow-2xl">
-              <div className="flex h-full">
-                <div className="flex w-1/4 flex-col gap-4 border-r border-brand-border p-4">
-                  <div className="flex items-center gap-2">
-                    <div className="size-7 rounded-full bg-brand-muted/20" />
-                    <div className="flex-1 space-y-1">
-                      <div className="h-2 w-16 rounded bg-brand-muted/40" />
-                      <div className="h-1.5 w-10 rounded bg-brand-muted/20" />
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <div className="h-7 rounded-md border border-brand-accent/30 bg-brand-accent/20" />
-                    <div className="h-7 rounded-md bg-brand-border/50" />
-                    <div className="h-7 rounded-md bg-brand-border/50" />
-                  </div>
-                </div>
-                <div className="flex flex-1 flex-col p-6">
-                  <div className="mb-6 flex items-center justify-between">
-                    <div className="h-6 w-40 rounded-md bg-brand-muted/20" />
-                    <div className="flex items-center gap-1.5 font-mono text-[10px] text-emerald-400">
-                      <span className="size-1.5 rounded-full bg-emerald-400" />
-                      SAVED
-                    </div>
-                  </div>
-                  <div className="space-y-3">
-                    <div className="h-3 w-full rounded bg-brand-muted/10" />
-                    <div className="h-3 w-[90%] rounded bg-brand-muted/10" />
-                    <div className="h-3 w-[95%] rounded bg-brand-muted/10" />
-                    <div className="h-3 w-[60%] rounded bg-brand-muted/10" />
-                  </div>
-                </div>
-                <div className="flex w-1/4 flex-col border-l border-brand-border bg-brand-surface/40">
-                  <div className="border-b border-brand-border p-3 text-[10px] font-bold tracking-widest text-brand-muted uppercase">
-                    AI Assistant
-                  </div>
-                  <div className="flex-1 space-y-3 p-3">
-                    <div className="rounded-xl border border-brand-accent/20 bg-brand-accent/10 p-2.5">
-                      <div className="mb-1 h-2 w-full rounded bg-brand-accent/40" />
-                      <div className="h-2 w-3/4 rounded bg-brand-accent/40" />
-                    </div>
-                    <div className="rounded-xl border border-brand-border bg-white/5 p-2.5">
-                      <div className="h-2 w-2/3 rounded bg-brand-muted/40" />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+          <div className="lg:col-span-7">
+  <div className="glass-card rounded-3xl p-8">
+    <div className="flex flex-col items-center gap-6">
+
+      <div className="w-full max-w-sm rounded-2xl border border-brand-border bg-brand-bg p-5 text-center">
+        <div className="mb-2 text-3xl">📄</div>
+        <h3 className="font-semibold">Notes & PDFs</h3>
+        <p className="mt-1 text-sm text-brand-muted">
+          Upload lecture notes, research papers and documents
+        </p>
+      </div>
+
+      <div className="text-3xl text-brand-accent animate-bounce">
+        ↓
+      </div>
+
+      <div className="w-full max-w-sm rounded-2xl border border-brand-accent/30 bg-brand-accent/10 p-5 text-center">
+        <div className="mb-2 text-3xl">🧠</div>
+        <h3 className="font-semibold">RAG Retrieval Engine</h3>
+        <p className="mt-1 text-sm text-brand-muted">
+          Finds the most relevant content from your documents
+        </p>
+      </div>
+
+      <div className="text-3xl text-brand-accent animate-bounce">
+        ↓
+      </div>
+
+      <div className="w-full max-w-sm rounded-2xl border border-violet-400/30 bg-violet-500/10 p-5 text-center">
+        <div className="mb-2 text-3xl">✨</div>
+        <h3 className="font-semibold">Gemini AI</h3>
+        <p className="mt-1 text-sm text-brand-muted">
+          Uses retrieved context to generate grounded answers
+        </p>
+      </div>
+
+      <div className="text-3xl text-brand-accent animate-bounce">
+        ↓
+      </div>
+
+      <div className="w-full max-w-sm rounded-2xl border border-emerald-400/30 bg-emerald-500/10 p-5 text-center">
+        <div className="mb-2 text-3xl">💬</div>
+        <h3 className="font-semibold">AI Response</h3>
+        <p className="mt-1 text-sm text-brand-muted">
+          Answers, summaries and insights based on YOUR data
+        </p>
+      </div>
+
+    </div>
+  </div>
+</div>
         </div>
       </section>
 
@@ -307,7 +281,7 @@ export default function Landing() {
             <a href="#" className="hover:text-foreground">
               Twitter
             </a>
-            <a href="#" className="hover:text-foreground">
+            <a href="https://github.com/AnushkaIndeed/smartnotes-ai" className="hover:text-foreground">
               GitHub
             </a>
           </div>

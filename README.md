@@ -2,7 +2,7 @@
 
 > Write notes. Upload PDFs. Chat with your own content using AI.
 
-**[Live Demo](https://smartnotes-ai-alpha.vercel.app)** · **[Backend API](https://smartnotes-ai-production-089d.up.railway.app)**
+**[Live Demo](https://smartnotes-ai-alpha.vercel.app)** · **[Backend API](https://smartnotes-ai-backend-silh.onrender.com)**
 
 A full-stack note-taking app with an AI chat layer. Write notes, organize them into folders, upload PDFs, and ask an LLM questions about your own content — the AI answers based only on what you've written, not generic training data. This is a RAG (Retrieval Augmented Generation) pipeline, built from scratch.
 

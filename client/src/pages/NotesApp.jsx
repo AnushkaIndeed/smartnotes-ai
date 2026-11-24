@@ -9,7 +9,7 @@ import ChatPanel from '../components/ChatPanel';
 export default function NotesApp() {
   const { notes, loading, createNote, updateNote, deleteNote } = useNotes();
   const { logout, user } = useAuth();
-  const { files, uploading, uploadFile, deleteFile } = useFiles();
+  const { files, uploading, uploadError, uploadFile, deleteFile } = useFiles();
   const { theme, toggleTheme } = useTheme();
 
   const [activeId, setActiveId] = useState(null);
@@ -67,11 +67,9 @@ export default function NotesApp() {
   };
 
   const handleDeleteFile = async (id) => {
-    await deleteFile(id);
-    if (chatTarget?.id === id) {
-      setChatTarget(null);
-    }
-  };
+  const ok = await deleteFile(id);
+  if (ok && chatTarget?.id === id) setChatTarget(null);
+};
 
   const handleSelectNote = (note) => {
     setActiveId(note._id);

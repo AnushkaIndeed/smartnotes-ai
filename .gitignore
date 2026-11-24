@@ -1,1 +1,3 @@
-processor/.venv/, __pycache__/, uploads/
+processor/.venv/
+__pycache__/
+uploads/

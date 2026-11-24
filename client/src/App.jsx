@@ -5,6 +5,7 @@ import Landing from './pages/Landing';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import NotesApp from './pages/NotesApp';
+import { Analytics } from "@vercel/analytics/next";
 
 // Wrapper — redirects to /login if not logged in
 function ProtectedRoute({ children }) {

@@ -5,7 +5,7 @@ import Landing from './pages/Landing';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import NotesApp from './pages/NotesApp';
-import { Analytics } from "@vercel/analytics/next";
+import { Analytics } from '@vercel/analytics/react';
 
 // Wrapper — redirects to /login if not logged in
 function ProtectedRoute({ children }) {
@@ -38,6 +38,7 @@ export default function App() {
       <ThemeProvider>
         <AuthProvider>
           <AppRoutes />
+          <Analytics />
         </AuthProvider>
       </ThemeProvider>
     </BrowserRouter>

@@ -2,4 +2,3 @@ node_modules
 .env
 *.log
 node_modules
-processor/.venv/, __pycache__/, uploads/

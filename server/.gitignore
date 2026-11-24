@@ -1,3 +1,5 @@
 node_modules
 .env
-*.lognode_modules
+*.log
+node_modules
+processor/.venv/, __pycache__/, uploads/

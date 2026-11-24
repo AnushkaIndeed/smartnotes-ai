@@ -15,13 +15,29 @@ const aiRoutes = require('./routes/ai');
 
 const app = express();
 
-// Middleware 
+// Middleware
+const configuredFrontendOrigins = (process.env.FRONTEND_URL || '')
+  .split(',')
+  .map((origin) => origin.trim())
+  .filter(Boolean);
+const allowedFrontendOrigins = new Set([
+  'http://localhost:5173',
+  'https://smartnotes-ai-alpha.vercel.app',
+  ...configuredFrontendOrigins
+]);
+const vercelPreviewOrigin = /^https:\/\/smartnotes-[a-z0-9]+-anushka-s-projects24\.vercel\.app$/i;
+
 app.use(cors({
-  origin: [
-    'http://localhost:5173',          // local dev
-    process.env.FRONTEND_URL          // production URL from .env
-  ],
-  credentials: true
+  origin: (origin, callback) => {
+    // Requests without an Origin header are non-browser clients (for example, health checks).
+    if (!origin || allowedFrontendOrigins.has(origin) || vercelPreviewOrigin.test(origin)) {
+      return callback(null, true);
+    }
+    return callback(new Error('Origin is not allowed by CORS'));
+  },
+  credentials: true,
+  methods: ['GET', 'HEAD', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
 }));
 app.use(express.json()); 
 

@@ -5,7 +5,27 @@
 | Synthetic text PDF | 50 | extraction | 0.18 | 40.11 |
 | Synthetic text PDF | 300 | extraction | 0.48 | 40.80 |
 | Synthetic text PDF | 1000 | extraction | 1.13 | 41.64 |
-| CN_CIC307_Handbook_Unit1_2.pdf.pdf | 50 | extraction | 0.12 | 37.53 |
+| CN_CIC307_Handbook_Unit1_2.pdf | 50 | extraction | 0.12 | 37.53 |
+
+## Embedding benchmarks
+
+| Document | Pages | Run | Chunks | Chunks/s | Total seconds | Peak RAM (MiB) | `truncated_by_model` |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| Synthetic text PDF | 300 | 1 | 900 | 341.6 | 7.37 | — | 0 |
+| Synthetic text PDF | 300 | 2 | 900 | 410.2 | 4.71 | — | 0 |
+| Synthetic text PDF | 1000 | 1 | 3000 | 476.7 | 10.24 | 646.26 | 0 |
+| CN_CIC307_Handbook_Unit1_2.pdf | 50 | 1 | 171 | 137.9 | 3.13 | — | 32 |
+
+ The 1000-page peak is 677,773,312 bytes, converted to 646.26 MiB. Its truncation count was calculated with the same model tokenizer because the terminal filter omitted that JSON field.
+
+## Similarity sanity check
+
+Using `sentence-transformers/all-MiniLM-L6-v2`:
+
+| Text pair | Similarity |
+|---|---:|
+| “How do I reset my password?” ↔ “I forgot my login credentials” | 0.678 |
+| “How do I reset my password?” ↔ “Banana bread needs ripe bananas” | 0.043 |
 
 ## Observations
 

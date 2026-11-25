@@ -83,3 +83,32 @@ def delete_document(client: QdrantClient, doc_id: str, user_id: str) -> None:
         points_selector=models.FilterSelector(filter=_filter(doc_id, user_id)),
         wait=True,
     )
+def search_filter(user_id: str, doc_ids: list[str] | None = None) -> models.Filter:
+    """Every search is scoped to one user. doc_ids narrows it further (None = all of that user's docs)."""
+    if not user_id:
+        raise ValueError("user_id is required for every search")
+    must = [models.FieldCondition(key="user_id", match=models.MatchValue(value=user_id))]
+    if doc_ids is not None:  # an empty list matches nothing, it never widens the search
+        must.append(models.FieldCondition(key="doc_id", match=models.MatchAny(any=doc_ids)))
+    return models.Filter(must=must)
+
+
+def search(client: QdrantClient, vector: list[float], user_id: str,
+           doc_ids: list[str] | None = None, top_k: int = 5) -> list[dict]:
+    response = client.query_points(
+        collection_name=COLLECTION,
+        query=vector,
+        query_filter=search_filter(user_id, doc_ids),
+        limit=top_k,
+        with_payload=True,
+    )
+    return [
+        {
+            "score": round(p.score, 4),
+            "doc_id": p.payload["doc_id"],
+            "page": p.payload["page"],
+            "chunk_id": p.payload["chunk_id"],
+            "text": p.payload["text"],
+        }
+        for p in response.points
+    ]

@@ -1,6 +1,6 @@
 """Embed a document's chunks and store them in Qdrant.
 
-    python ingest.py add    output/doc.jsonl --doc-id d1 --user-id u1
+    python ingest.py add    output/doc.jsonl --doc-id d1 --user-id u1 [--replace]
     python ingest.py count  --doc-id d1 [--user-id u1]
     python ingest.py delete --doc-id d1 --user-id u1
 
@@ -24,14 +24,16 @@ def batched(iterable, n):
             return
         yield batch
 
-
 def ingest(jsonl_path, doc_id: str, user_id: str, batch_size: int = 64,
-           size: int = DEFAULT_SIZE, overlap: int = DEFAULT_OVERLAP) -> dict:
+           size: int = DEFAULT_SIZE, overlap: int = DEFAULT_OVERLAP,
+           replace: bool = False) -> dict:
     import embedder  # imported here so tests of the pure helpers don't load PyTorch
 
     started = time.perf_counter()
     client = get_client()
     ensure_collection(client, embedder.dimension())
+    if replace:
+        delete_document(client, doc_id, user_id)
 
     total = truncated = 0
     embed_seconds = 0.0
@@ -70,6 +72,7 @@ def main() -> int:
     add.add_argument("--batch-size", type=int, default=64)
     add.add_argument("--size", type=int, default=DEFAULT_SIZE)
     add.add_argument("--overlap", type=int, default=DEFAULT_OVERLAP)
+    add.add_argument("--replace", action="store_true")
 
     cnt = sub.add_parser("count")
     cnt.add_argument("--doc-id")
@@ -83,7 +86,15 @@ def main() -> int:
     try:
         if args.cmd == "add":
             print(json.dumps(
-                ingest(args.jsonl, args.doc_id, args.user_id, args.batch_size, args.size, args.overlap),
+                ingest(
+                    args.jsonl,
+                    args.doc_id,
+                    args.user_id,
+                    args.batch_size,
+                    args.size,
+                    args.overlap,
+                    replace=args.replace,
+                ),
                 indent=2))
         elif args.cmd == "count":
             print(count_points(get_client(), args.doc_id, args.user_id))

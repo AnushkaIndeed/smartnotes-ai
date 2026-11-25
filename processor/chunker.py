@@ -17,8 +17,8 @@ import time
 from pathlib import Path
 from typing import Iterator
 
-DEFAULT_SIZE = 900
-DEFAULT_OVERLAP = 150
+DEFAULT_SIZE = 500
+DEFAULT_OVERLAP = 80
 MIN_PAGE_CHARS = 30  # pages with less text than this (e.g. just a page number) produce no chunks
 
 _SENTENCE_END = re.compile(r"[.!?][\"')\]]?\s")

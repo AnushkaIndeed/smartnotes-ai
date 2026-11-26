@@ -2,6 +2,8 @@ import hmac
 import os
 import time
 from contextlib import asynccontextmanager
+import pipeline
+from storage import resolve_storage_path
 
 from fastapi import Depends, FastAPI, Header, HTTPException, Request
 from pydantic import BaseModel, Field
@@ -63,3 +65,33 @@ def search_endpoint(req: SearchRequest, request: Request):
     vector = embedder.embed_texts([req.question])[0]
     results = vectorstore.search(request.app.state.qdrant, vector, req.user_id, req.doc_ids, req.top_k)
     return {"results": results, "took_ms": round((time.perf_counter() - started) * 1000)}   
+
+class IngestRequest(BaseModel):
+    doc_id: str = Field(min_length=1)
+    user_id: str = Field(min_length=1)
+    file_key: str = Field(min_length=1)  # path relative to STORAGE_DIR
+
+
+class IngestResponse(BaseModel):
+    doc_id: str
+    pages: int
+    chunks: int
+    weak_pages: int
+    seconds: float
+
+
+@app.post("/ingest", response_model=IngestResponse, dependencies=[Depends(require_internal_key)])
+def ingest_endpoint(req: IngestRequest, request: Request):
+    try:
+        path = resolve_storage_path(req.file_key)
+    except FileNotFoundError:
+        raise HTTPException(status_code=404, detail="File not found in storage")
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
+
+    try:
+        return pipeline.ingest_pdf(request.app.state.qdrant, path, req.doc_id, req.user_id)
+    except ValueError as exc:  # e.g. "PDF is encrypted"
+        raise HTTPException(status_code=422, detail=str(exc))
+    except RuntimeError:  # PyMuPDF raises these for corrupt files
+        raise HTTPException(status_code=422, detail="Could not read this PDF")

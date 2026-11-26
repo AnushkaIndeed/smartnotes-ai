@@ -18,6 +18,17 @@
 
  The 1000-page peak is 677,773,312 bytes, converted to 646.26 MiB. Its truncation count was calculated with the same model tokenizer because the terminal filter omitted that JSON field.
 
+## End-to-end API timings
+
+These timings cover the Express upload request from start to response (extraction, embedding, and Qdrant storage) and one chat request through answer generation. They are elapsed `curl` `time_total` measurements.
+
+| Document | Pages | Upload total (s) | Chat answer (s) |
+|---|---:|---:|---:|
+| Synthetic text PDF (`sample_50.pdf`) | 50 | 0.923 | 2.041 |
+| Synthetic text PDF (`sample_300.pdf`) | 300 | 3.301 | 1.805 |
+
+For each PDF, record `curl -w '%{time_total}\n'` for its upload and for one chat request against its returned file ID. Keep Qdrant, the processor, and Express running, and use the same question for both chat measurements so the results are comparable.
+
 ## Retrieval quality
 
 Results use 15 answerable questions; the three no-answer probes are excluded from hit-rate and MRR. Average latency is the evaluation script's query-embedding-plus-search time.

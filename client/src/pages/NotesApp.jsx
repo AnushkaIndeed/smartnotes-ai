@@ -5,6 +5,7 @@ import { useAuth } from '../context/AuthContext';
 import { useFiles } from '../hooks/useFiles';
 import { useTheme } from '../context/ThemeContext';
 import ChatPanel from '../components/ChatPanel';
+import PdfViewer from '../components/PdfViewer';
 
 export default function NotesApp() {
   const { notes, loading, createNote, updateNote, deleteNote } = useNotes();
@@ -16,10 +17,21 @@ export default function NotesApp() {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [chatTarget, setChatTarget] = useState(null);
+  const [citation, setCitation] = useState(null);
   const [saveStatus, setSaveStatus] = useState('saved');
-  const [chatWidth, setChatWidth] = useState(() => Number(localStorage.getItem('chatWidth')) || 340);
+  const [chatWidth, setChatWidth] = useState(() => {
+    const savedWidth = Number(localStorage.getItem('chatWidth')) || 400;
+    return Math.min(Math.max(savedWidth, 360), 560);
+  });
 
   const activeNote = notes.find((n) => n._id === activeId);
+  const selectedFile = chatTarget?.type === 'file' ? files.find((f) => f._id === chatTarget.id) : null;
+  const viewingPdf = selectedFile?.status === 'completed';
+
+  const handleCitationClick = (page) => {
+    if (chatTarget?.type !== 'file') return;
+    setCitation({ fileId: chatTarget.id, page, nonce: Date.now() });
+  };
 
   useEffect(() => {
     if (activeNote) {
@@ -78,6 +90,7 @@ export default function NotesApp() {
   };
 
   const handleSelectFile = (file) => {
+    setCitation(null);
     setActiveId(null);
     setTitle('');
     setContent('');
@@ -91,26 +104,37 @@ export default function NotesApp() {
   };
 
   const handleResizeStart = (e) => {
+    if (e.button !== 0) return;
     e.preventDefault();
+    const divider = e.currentTarget;
+    const pointerId = e.pointerId;
     const startX = e.clientX;
     const startWidth = chatWidth;
 
     const handlePointerMove = (moveEvent) => {
+      if (moveEvent.pointerId !== pointerId) return;
       const nextWidth = startWidth - (moveEvent.clientX - startX);
-      setChatWidth(Math.min(Math.max(nextWidth, 260), 560));
+      setChatWidth(Math.min(Math.max(nextWidth, 360), 560));
     };
 
-    const handlePointerUp = () => {
-      window.removeEventListener('pointermove', handlePointerMove);
-      window.removeEventListener('pointerup', handlePointerUp);
+    const handlePointerEnd = (endEvent) => {
+      if (endEvent.pointerId !== pointerId) return;
+      divider.removeEventListener('pointermove', handlePointerMove);
+      divider.removeEventListener('pointerup', handlePointerEnd);
+      divider.removeEventListener('pointercancel', handlePointerEnd);
+      divider.removeEventListener('lostpointercapture', handlePointerEnd);
+      if (divider.hasPointerCapture(pointerId)) divider.releasePointerCapture(pointerId);
       document.body.style.cursor = '';
       document.body.style.userSelect = '';
     };
 
+    divider.setPointerCapture(pointerId);
     document.body.style.cursor = 'col-resize';
     document.body.style.userSelect = 'none';
-    window.addEventListener('pointermove', handlePointerMove);
-    window.addEventListener('pointerup', handlePointerUp);
+    divider.addEventListener('pointermove', handlePointerMove);
+    divider.addEventListener('pointerup', handlePointerEnd);
+    divider.addEventListener('pointercancel', handlePointerEnd);
+    divider.addEventListener('lostpointercapture', handlePointerEnd);
   };
 
   return (
@@ -261,7 +285,7 @@ export default function NotesApp() {
               PDFs
             </p>
             <label style={{ fontSize: '11px', color: 'var(--accent)', cursor: uploading ? 'not-allowed' : 'pointer', fontWeight: '500' }}>
-              {uploading ? 'Uploading...' : '+ Upload'}
+              {uploading ? 'Uploading and indexing...' : '+ Upload'}
               <input
                 type="file"
                 accept="application/pdf"
@@ -271,6 +295,12 @@ export default function NotesApp() {
               />
             </label>
           </div>
+
+          {uploadError && (
+            <p role="alert" style={{ margin: '0 0 8px', fontSize: '11px', lineHeight: '1.4', color: 'var(--danger)' }}>
+              {uploadError}
+            </p>
+          )}
 
           <div style={{ maxHeight: '140px', overflowY: 'auto' }}>
             {files.length === 0 && (
@@ -307,6 +337,11 @@ export default function NotesApp() {
                   }}>
                     {f.filename}
                   </span>
+                  {(f.status === 'processing' || f.status === 'failed') && (
+                    <span style={{ fontSize: '10px', flexShrink: 0, color: f.status === 'failed' ? 'var(--danger)' : 'var(--text-tertiary)' }}>
+                      {f.status === 'failed' ? 'failed' : 'indexing...'}
+                    </span>
+                  )}
                 </div>
 
                 <button
@@ -340,7 +375,11 @@ export default function NotesApp() {
           </div>
         )}
 
-        <div style={{ flex: 1, overflowY: 'auto', padding: activeNote ? '48px 64px' : '0' }}>
+        <div style={{
+          flex: 1, minHeight: 0,
+          overflowY: viewingPdf ? 'hidden' : 'auto',
+          padding: activeNote ? '48px 64px' : '0',
+        }}>
           {activeNote ? (
             <>
               <input
@@ -367,17 +406,31 @@ export default function NotesApp() {
                 }}
               />
             </>
+          ) : viewingPdf ? (
+            <PdfViewer
+              key={selectedFile._id}
+              fileId={selectedFile._id}
+              filename={selectedFile.filename}
+              totalPages={selectedFile.totalPages}
+              jump={citation && citation.fileId === selectedFile._id ? citation : null}
+            />
           ) : (
             <div style={{
               display: 'flex', flexDirection: 'column',
               alignItems: 'center', justifyContent: 'center',
-              height: '100%', gap: '12px',
+              height: '100%', gap: '12px', padding: '24px', textAlign: 'center',
             }}>
               {chatTarget?.type === 'file' ? (
                 <>
                   <span style={{ fontSize: '36px' }}>📄</span>
                   <p style={{ fontSize: '15px', fontWeight: '500', color: 'var(--text-secondary)' }}>{chatTarget.title}</p>
-                  <p style={{ fontSize: '13px', color: 'var(--text-tertiary)' }}>Ask questions about this PDF in the chat →</p>
+                  <p style={{ fontSize: '13px', color: 'var(--text-tertiary)', maxWidth: '360px' }}>
+                    {selectedFile?.status === 'processing'
+                      ? 'Still indexing this document...'
+                      : selectedFile?.status === 'failed'
+                      ? 'This document could not be processed.'
+                      : 'Uploaded before the viewer existed. Re-upload it to see it here. Chat still works.'}
+                  </p>
                 </>
               ) : (
                 <>
@@ -399,6 +452,7 @@ export default function NotesApp() {
           width: '8px',
           flexShrink: 0,
           cursor: 'col-resize',
+          touchAction: 'none',
           background: 'var(--bg-primary)',
           borderLeft: '1px solid var(--border)',
           borderRight: '1px solid var(--border)',
@@ -409,7 +463,7 @@ export default function NotesApp() {
 
       {/* Chat panel */}
       <div style={{
-        width: `${chatWidth}px`, minWidth: '260px', maxWidth: '560px',
+        width: `${chatWidth}px`, minWidth: '360px', maxWidth: '560px',
         display: 'flex', flexDirection: 'column',
         overflow: 'hidden', background: 'var(--bg-primary)',
       }}>
@@ -417,6 +471,7 @@ export default function NotesApp() {
           contentId={chatTarget?.id}
           contentType={chatTarget?.type}
           contentTitle={chatTarget?.title}
+          onCitationClick={handleCitationClick}
         />
       </div>
 

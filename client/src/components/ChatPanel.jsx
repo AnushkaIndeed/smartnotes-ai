@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useAI } from '../hooks/useAI';
 
-export default function ChatPanel({ contentId, contentType, contentTitle }) {
+export default function ChatPanel({ contentId, contentType, contentTitle, onCitationClick }) {
   const [input, setInput] = useState('');
   const { messages, loading, error, sendMessage, clearMessages } = useAI();
   const bottomRef = useRef(null);
@@ -77,25 +77,46 @@ export default function ChatPanel({ contentId, contentType, contentTitle }) {
       {messages.map((msg, i) => (
         <div
           key={i}
-          className={`text-sm rounded-xl p-3 max-w-[90%] whitespace-pre-wrap ${
-            msg.role === 'user' ? 'ml-auto' : ''
-          }`}
-          style={{
-            background:
-              msg.role === 'user'
-                ? 'var(--accent)'
-                : 'var(--bg-secondary)',
-            color:
-              msg.role === 'user'
-                ? '#ffffff'
-                : 'var(--text-primary)',
-            border:
-              msg.role === 'user'
-                ? 'none'
-                : '1px solid var(--border)',
-          }}
+          style={{ display: 'flex', flexDirection: 'column', alignItems: msg.role === 'user' ? 'flex-end' : 'flex-start' }}
         >
-          {msg.text}
+          <div
+            className="text-sm rounded-xl p-3 max-w-[90%] whitespace-pre-wrap"
+            style={{
+              background:
+                msg.role === 'user'
+                  ? 'var(--accent)'
+                  : 'var(--bg-secondary)',
+              color:
+                msg.role === 'user'
+                  ? '#ffffff'
+                  : 'var(--text-primary)',
+              border:
+                msg.role === 'user'
+                  ? 'none'
+                  : '1px solid var(--border)',
+            }}
+          >
+            {msg.text}
+          </div>
+          {msg.role === 'ai' && msg.sources?.length > 0 && (
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', marginTop: '6px', maxWidth: '85%' }}>
+              {msg.sources.map((source) => (
+                <button
+                  key={source.n}
+                  type="button"
+                  onClick={() => onCitationClick?.(source.page)}
+                  title={source.snippet}
+                  style={{
+                    padding: '3px 8px', fontSize: '11px', borderRadius: '999px',
+                    background: 'var(--accent-soft)', color: 'var(--accent)',
+                    border: '1px solid var(--border)', cursor: 'pointer',
+                  }}
+                >
+                  [{source.n}] p. {source.page}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       ))}
 

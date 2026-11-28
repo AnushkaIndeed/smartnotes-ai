@@ -18,7 +18,12 @@ export function useAI() {
     try {
       const res = await api.post('/ai/chat', { contentId, contentType, question });
 
-      const aiMessage = { role: 'ai', text: res.data.answer };
+      const aiMessage = {
+        role: 'ai',
+        text: res.data.answer,
+        truncated: res.data.truncated,
+        sources: res.data.sources || [],
+      };
       setMessages((prev) => [...prev, aiMessage]);
 
     } catch (err) {
